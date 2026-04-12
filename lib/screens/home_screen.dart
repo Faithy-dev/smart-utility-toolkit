@@ -36,9 +36,11 @@ class HomeScreen extends StatelessWidget {
               Expanded(
                 child: Center(
                   child: Lottie.network(
-                    "https://lottie.host/de9b06cc-ef34-46e1-be75-9491f5752096/Wr1O3MTMq5.json",
+                    "https://assets2.lottiefiles.com/packages/lf20_3rwasyjy.json",
                     width: 500,
                     height: 500,
+                    repeat: true,
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),

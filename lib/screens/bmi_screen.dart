@@ -48,7 +48,13 @@ class _BMIScreenState extends State<BMIScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("BMI Calculator"),
+        title: const Text(
+          "BMI Calculator",
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -56,16 +62,12 @@ class _BMIScreenState extends State<BMIScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 10),
-
-            // Height Input
             const Text(
               "Height (cm)",
               style:
                   TextStyle(fontSize: 14, color: Color.fromARGB(255, 0, 0, 0)),
             ),
-
             const SizedBox(height: 6),
-
             TextField(
               controller: heightController,
               keyboardType: TextInputType.number,
@@ -74,18 +76,13 @@ class _BMIScreenState extends State<BMIScreen>
                 hintText: "e.g. 175",
               ),
             ),
-
             const SizedBox(height: 20),
-
-            // Weight Input
             const Text(
               "Weight (kg)",
               style:
                   TextStyle(fontSize: 14, color: Color.fromARGB(255, 0, 0, 0)),
             ),
-
             const SizedBox(height: 6),
-
             TextField(
               controller: weightController,
               keyboardType: TextInputType.number,
@@ -94,9 +91,7 @@ class _BMIScreenState extends State<BMIScreen>
                 hintText: "e.g. 70",
               ),
             ),
-
             const SizedBox(height: 20),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -112,10 +107,7 @@ class _BMIScreenState extends State<BMIScreen>
                 ),
               ),
             ),
-
             const SizedBox(height: 30),
-
-            // Result
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 400),
               child: bmi == null

@@ -66,7 +66,13 @@ class _ConverterScreenState extends State<ConverterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Unit Converter"),
+        title: const Text(
+          "Unit Converter",
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -74,8 +80,6 @@ class _ConverterScreenState extends State<ConverterScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 10),
-
-            // TYPE SELECTOR
             Row(
               children: [
                 Expanded(
@@ -112,10 +116,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 30),
-
-            // INPUT LABEL
             Text(
               "Value in ${getFromUnit()}",
               style: const TextStyle(
@@ -123,9 +124,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                 color: Color.fromARGB(255, 0, 0, 0),
               ),
             ),
-
             const SizedBox(height: 8),
-
             TextField(
               controller: controller,
               keyboardType: TextInputType.number,
@@ -135,9 +134,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                 hintText: "Enter value...",
               ),
             ),
-
             const SizedBox(height: 30),
-
             const Text(
               "Result",
               style: TextStyle(
@@ -145,9 +142,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
                 color: Color.fromARGB(255, 0, 0, 0),
               ),
             ),
-
             const SizedBox(height: 8),
-
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               child: Container(

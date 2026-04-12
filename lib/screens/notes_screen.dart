@@ -24,7 +24,6 @@ class _NotesScreenState extends State<NotesScreen> {
     loadNotes();
   }
 
-  /// LOAD NOTES
   Future<void> loadNotes() async {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString('smart_toolkit_notes');
@@ -37,7 +36,6 @@ class _NotesScreenState extends State<NotesScreen> {
     }
   }
 
-  /// SAVE NOTES
   Future<void> saveNotes() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -47,10 +45,11 @@ class _NotesScreenState extends State<NotesScreen> {
     );
   }
 
-  /// ADD NOTE
   void addNote() {
     if (titleController.text.trim().isEmpty ||
-        contentController.text.trim().isEmpty) return;
+        contentController.text.trim().isEmpty) {
+      return;
+    }
 
     final note = Note(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -70,7 +69,6 @@ class _NotesScreenState extends State<NotesScreen> {
     saveNotes();
   }
 
-  /// DELETE NOTE
   void deleteNote(String id) {
     setState(() {
       notes.removeWhere((n) => n.id == id);
@@ -90,7 +88,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   isAdding = true;
                 });
               },
-              child: Icon(SolarIconsOutline.addCircle),
+              child: const Icon(SolarIconsOutline.addCircle),
             )
           : null,
       body: SafeArea(
@@ -99,8 +97,6 @@ class _NotesScreenState extends State<NotesScreen> {
           child: Column(
             children: [
               const SizedBox(height: 10),
-
-              /// TITLE
               const Text(
                 "Notes Tool",
                 style: TextStyle(
@@ -108,13 +104,8 @@ class _NotesScreenState extends State<NotesScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              /// ADD NOTE FORM
               if (isAdding) buildAddNote(),
-
-              /// NOTES LIST
               if (!isAdding) Expanded(child: buildNotesList()),
             ],
           ),
@@ -123,7 +114,6 @@ class _NotesScreenState extends State<NotesScreen> {
     );
   }
 
-  /// ADD NOTE UI
   Widget buildAddNote() {
     return Column(
       children: [
@@ -177,22 +167,19 @@ class _NotesScreenState extends State<NotesScreen> {
     );
   }
 
-  /// NOTES LIST UI
   Widget buildNotesList() {
     if (notes.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            /// LOTTIE EMPTY STATE
             Lottie.network(
-              "https://lottie.host/5b35fc2e-0139-406e-a728-ab198e2b31b6/XT4Qo1uTzP.json",
+              "https://assets9.lottiefiles.com/packages/lf20_t24tpvcu.json",
               width: 220,
               repeat: true,
+              fit: BoxFit.contain,
             ),
-
             const SizedBox(height: 20),
-
             const Text(
               "No notes yet",
               style: TextStyle(
@@ -200,7 +187,6 @@ class _NotesScreenState extends State<NotesScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             const Text(
               "Tap + to create your first note",
               style: TextStyle(color: Colors.grey),
@@ -273,7 +259,6 @@ class _NotesScreenState extends State<NotesScreen> {
   }
 }
 
-/// NOTE MODEL
 class Note {
   final String id;
   final String title;

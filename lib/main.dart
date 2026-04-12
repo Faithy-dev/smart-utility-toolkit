@@ -44,8 +44,6 @@ class _SmartUtilityToolkitState extends State<SmartUtilityToolkit>
           index: currentIndex,
           children: screens,
         ),
-
-        // 🌟 ULTRA PREMIUM NAVBAR
         bottomNavigationBar: Padding(
           padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
           child: ClipRRect(
