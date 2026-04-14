@@ -311,8 +311,6 @@ class _NotesScreenState extends State<NotesScreen> {
                         .split(" ")[0],
                     style: const TextStyle(fontSize: 11, color: Colors.grey),
                   ),
-
-                  // ✅ buttons now properly side-by-side + functional
                   Row(
                     children: [
                       IconButton(

@@ -226,7 +226,6 @@ class _TasksScreenState extends State<TasksScreen> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              // HEADER (clean + back button)
               Row(
                 children: [
                   IconButton(
@@ -243,9 +242,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 20),
-
               Expanded(
                 child: tasks.isEmpty
                     ? const Center(
