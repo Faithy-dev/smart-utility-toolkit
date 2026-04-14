@@ -5,7 +5,9 @@ import 'package:lottie/lottie.dart';
 import 'package:solar_icons/solar_icons.dart';
 
 class NotesScreen extends StatefulWidget {
-  const NotesScreen({super.key});
+  final VoidCallback onBack;
+
+  const NotesScreen({super.key, required this.onBack});
 
   @override
   State<NotesScreen> createState() => _NotesScreenState();
@@ -38,7 +40,6 @@ class _NotesScreenState extends State<NotesScreen> {
 
   Future<void> saveNotes() async {
     final prefs = await SharedPreferences.getInstance();
-
     await prefs.setString(
       'smart_toolkit_notes',
       jsonEncode(notes.map((e) => e.toJson()).toList()),
@@ -47,9 +48,7 @@ class _NotesScreenState extends State<NotesScreen> {
 
   void addNote() {
     if (titleController.text.trim().isEmpty ||
-        contentController.text.trim().isEmpty) {
-      return;
-    }
+        contentController.text.trim().isEmpty) return;
 
     final note = Note(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -65,7 +64,6 @@ class _NotesScreenState extends State<NotesScreen> {
 
     titleController.clear();
     contentController.clear();
-
     saveNotes();
   }
 
@@ -73,8 +71,84 @@ class _NotesScreenState extends State<NotesScreen> {
     setState(() {
       notes.removeWhere((n) => n.id == id);
     });
-
     saveNotes();
+  }
+
+  void editNote(Note note) {
+    titleController.text = note.title;
+    contentController.text = note.content;
+
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Edit Note",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  hintText: "Title",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: contentController,
+                maxLines: 4,
+                decoration: const InputDecoration(
+                  hintText: "Content",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("Cancel"),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4F46E5),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          note.title = titleController.text;
+                          note.content = contentController.text;
+                        });
+
+                        saveNotes();
+                        titleController.clear();
+                        contentController.clear();
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Save",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -83,11 +157,7 @@ class _NotesScreenState extends State<NotesScreen> {
       floatingActionButton: !isAdding
           ? FloatingActionButton(
               backgroundColor: const Color(0xFF4F46E5),
-              onPressed: () {
-                setState(() {
-                  isAdding = true;
-                });
-              },
+              onPressed: () => setState(() => isAdding = true),
               child: const Icon(SolarIconsOutline.addCircle),
             )
           : null,
@@ -96,13 +166,21 @@ class _NotesScreenState extends State<NotesScreen> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              const SizedBox(height: 10),
-              const Text(
-                "Notes Tool",
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: widget.onBack,
+                    icon: const Icon(Icons.arrow_back),
+                  ),
+                  const SizedBox(width: 10),
+                  const Text(
+                    "Notes Tool",
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
               if (isAdding) buildAddNote(),
@@ -138,13 +216,8 @@ class _NotesScreenState extends State<NotesScreen> {
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: () {
-                  setState(() {
-                    isAdding = false;
-                  });
-                },
-                child: const Text("Cancel",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                onPressed: () => setState(() => isAdding = false),
+                child: const Text("Cancel"),
               ),
             ),
             const SizedBox(width: 10),
@@ -155,9 +228,8 @@ class _NotesScreenState extends State<NotesScreen> {
                 ),
                 onPressed: addNote,
                 child: const Text(
-                  "Save Note",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
+                  "Save",
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
             ),
@@ -173,19 +245,17 @@ class _NotesScreenState extends State<NotesScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Lottie.network(
-              "https://assets9.lottiefiles.com/packages/lf20_t24tpvcu.json",
+            SizedBox(
               width: 220,
-              repeat: true,
-              fit: BoxFit.contain,
+              height: 220,
+              child: Lottie.network(
+                "https://assets9.lottiefiles.com/packages/lf20_t24tpvcu.json",
+              ),
             ),
             const SizedBox(height: 20),
             const Text(
               "No notes yet",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const Text(
               "Tap + to create your first note",
@@ -214,42 +284,48 @@ class _NotesScreenState extends State<NotesScreen> {
               )
             ],
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      note.title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      note.content,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      DateTime.fromMillisecondsSinceEpoch(note.createdAt)
-                          .toLocal()
-                          .toString()
-                          .split(" ")[0],
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey,
-                      ),
-                    )
-                  ],
+              Text(
+                note.title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline),
-                onPressed: () => deleteNote(note.id),
+              const SizedBox(height: 6),
+              Text(
+                note.content,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    DateTime.fromMillisecondsSinceEpoch(note.createdAt)
+                        .toLocal()
+                        .toString()
+                        .split(" ")[0],
+                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
+
+                  // ✅ buttons now properly side-by-side + functional
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(SolarIconsOutline.pen),
+                        onPressed: () => editNote(note),
+                      ),
+                      IconButton(
+                        icon: const Icon(SolarIconsOutline.trashBinTrash),
+                        onPressed: () => deleteNote(note.id),
+                      ),
+                    ],
+                  ),
+                ],
               )
             ],
           ),
@@ -261,8 +337,8 @@ class _NotesScreenState extends State<NotesScreen> {
 
 class Note {
   final String id;
-  final String title;
-  final String content;
+  String title;
+  String content;
   final int createdAt;
 
   Note({
@@ -272,14 +348,12 @@ class Note {
     required this.createdAt,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      "id": id,
-      "title": title,
-      "content": content,
-      "createdAt": createdAt,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "title": title,
+        "content": content,
+        "createdAt": createdAt,
+      };
 
   factory Note.fromJson(Map<String, dynamic> json) {
     return Note(

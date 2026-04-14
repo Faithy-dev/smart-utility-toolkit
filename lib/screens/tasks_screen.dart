@@ -4,7 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solar_icons/solar_icons.dart';
 
 class TasksScreen extends StatefulWidget {
-  const TasksScreen({super.key});
+  final VoidCallback onBack;
+
+  const TasksScreen({super.key, required this.onBack});
 
   @override
   State<TasksScreen> createState() => _TasksScreenState();
@@ -20,12 +22,21 @@ class _TasksScreenState extends State<TasksScreen> {
     loadTasks();
   }
 
+  @override
+  void dispose() {
+    taskController.dispose();
+    super.dispose();
+  }
+
   Future<void> loadTasks() async {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString("smart_toolkit_tasks");
 
     if (saved != null) {
       final List decoded = jsonDecode(saved);
+
+      if (!mounted) return;
+
       setState(() {
         tasks = decoded.map((e) => Task.fromJson(e)).toList();
       });
@@ -46,7 +57,7 @@ class _TasksScreenState extends State<TasksScreen> {
 
     final task = Task(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: taskController.text,
+      title: taskController.text.trim(),
       completed: false,
     );
 
@@ -91,10 +102,7 @@ class _TasksScreenState extends State<TasksScreen> {
             children: [
               const Text(
                 "Edit Task",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
               TextField(
@@ -123,7 +131,7 @@ class _TasksScreenState extends State<TasksScreen> {
                       ),
                       onPressed: () {
                         setState(() {
-                          task.title = taskController.text;
+                          task.title = taskController.text.trim();
                         });
 
                         saveTasks();
@@ -145,73 +153,72 @@ class _TasksScreenState extends State<TasksScreen> {
     );
   }
 
+  void openAddDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "New Task",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: taskController,
+                decoration: InputDecoration(
+                  hintText: "Enter task...",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("Cancel"),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4F46E5),
+                      ),
+                      onPressed: () {
+                        addTask();
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Add Task",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF4F46E5),
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (_) => Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      "New Task",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: taskController,
-                      decoration: InputDecoration(
-                        hintText: "Enter task...",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text("Cancel"),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF4F46E5),
-                            ),
-                            onPressed: () {
-                              addTask();
-                              Navigator.pop(context);
-                            },
-                            child: const Text(
-                              "Add Task",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
+        onPressed: openAddDialog,
         child: const Icon(SolarIconsOutline.addCircle),
       ),
       body: SafeArea(
@@ -219,14 +226,26 @@ class _TasksScreenState extends State<TasksScreen> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              const Text(
-                "Task Manager",
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                ),
+              // HEADER (clean + back button)
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: widget.onBack,
+                  ),
+                  const SizedBox(width: 10),
+                  const Text(
+                    "Task Manager",
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
+
               const SizedBox(height: 20),
+
               Expanded(
                 child: tasks.isEmpty
                     ? const Center(
@@ -328,19 +347,15 @@ class Task {
     required this.completed,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      "id": id,
-      "title": title,
-      "completed": completed,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "title": title,
+        "completed": completed,
+      };
 
-  factory Task.fromJson(Map<String, dynamic> json) {
-    return Task(
-      id: json["id"],
-      title: json["title"],
-      completed: json["completed"],
-    );
-  }
+  factory Task.fromJson(Map<String, dynamic> json) => Task(
+        id: json["id"],
+        title: json["title"],
+        completed: json["completed"],
+      );
 }
