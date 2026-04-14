@@ -5,6 +5,7 @@ import 'screens/converter_screen.dart';
 import 'screens/notes_screen.dart';
 import 'screens/bmi_screen.dart';
 import 'package:solar_icons/solar_icons.dart';
+import 'screens/tasks_screen.dart';
 
 void main() {
   runApp(const SmartUtilityToolkit());
@@ -21,11 +22,12 @@ class _SmartUtilityToolkitState extends State<SmartUtilityToolkit>
     with SingleTickerProviderStateMixin {
   int currentIndex = 0;
 
-  final screens = const [
+  final screens = [
     HomeScreen(),
     ConverterScreen(),
     NotesScreen(),
     BMIScreen(),
+    TasksScreen(),
   ];
 
   @override
@@ -77,6 +79,8 @@ class _SmartUtilityToolkitState extends State<SmartUtilityToolkit>
                         "Notes"),
                     _buildTab(SolarIconsOutline.heartPulse,
                         SolarIconsBold.heartPulse, 3, "BMI"),
+                    _buildTab(SolarIconsOutline.checklistMinimalistic,
+                        SolarIconsBold.checklistMinimalistic, 4, "Tasks"),
                   ],
                 ),
               ),
